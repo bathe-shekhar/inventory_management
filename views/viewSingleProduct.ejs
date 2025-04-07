@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/74476eabdf.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <!-- <img src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="Logo" width="30" height="24"
+                            class="d-inline-block align-text-top"> -->
+                Inventory Management System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/product">Products</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container row" style="height: 100%;">
+
+        <div class="sidebar col-3" style="padding: 40px; background-color: aliceblue; height: 100%;">
+            <h5>Categories:</h5>
+            <% categories.forEach((category)=>{
+                if(category.category_id ===0 ){%>
+                <div class="category-item row">
+                    <div class="col-12 category-list-name">
+
+                        <a href="/product?category=<%= category.category_id %>" class="category-link">
+                            <%= category.category_name %>
+                        </a>
+                    </div>
+                </div>
+                <% } else {%>
+                    <div class="category-item row">
+                        <div class="col-8 category-list-name">
+
+                            <a href="/product?category=<%= category.category_id %>" class="category-link">
+                                <%= category.category_name %>
+                            </a>
+                        </div>
+                        <div class="col-4">
+                            <form action="/category/<%= category.category_id%>" method="GET">
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-eye"></i></button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    <% } }); %>
+
+                        <div>
+                            <form action="/category/new" method="GET">
+                                <button type="submit" class="btn btn-success">Create Category</button>
+                            </form>
+                        </div>
+        </div>
+        <div class="product-details col-9" style="padding: 40px;">
+            <h4>Product Details:</h4>
+            <p>Product ID: <%= product.product_id %>
+            </p>
+            <p>Product Name: <%= product.product_name %>
+            </p>
+            <p>Category Name: <%= category %>
+            </p>
+            <form action="/product/delete/<%= product.product_id %>" method="GET">
+                <button type="submit" class="btn btn-danger">Delete Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
