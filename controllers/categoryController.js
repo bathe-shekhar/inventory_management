@@ -1,17 +1,44 @@
 const db = require("../db/queries"); // Assuming you have a models directory with your database models
+const { body, validationResult } = require("express-validator");
+
+const alphaErr = "must contain only characters.";
+const lengthErr = "must be between 1 to 20 characters";
+
+const validateCategory = [
+    body("category_name")
+        .isLength({ min: 1, max: 20 }).withMessage(`Category name ${lengthErr}`)
+        .isAlpha().withMessage(`Category name ${alphaErr}`)
+];
 
 async function createGetCategory(req, res) {
     const categories = await db.getAllCategories();
-    console.log("inside createGetCategory");
+    categories.unshift({ category_id: 0, category_name: 'All Products' });
+
+    // console.log("inside createGetCategory");
     res.render("createCategory", { title: "Create Category", categories: categories });
 }
+const createPostCategory = [
+    validateCategory,
+    async (req, res) => {
 
-async function createPostCategory(req, res) {
-    const { category_name } = req.body;
-    // Assuming you have a function to save the category to the database
-    await db.insertCategory(category_name);
-    res.redirect("/");
-}
+        const errors = validationResult(req);
+        const categories = await db.getAllCategories();
+        categories.unshift({ category_id: 0, category_name: 'All Products' });
+
+        if (!errors.isEmpty()) {
+            return res.status(400).render("createCategory", {
+                title: "Create Category",
+                errors: errors.array(),
+                categories: categories,
+            });
+        }
+
+        const { category_name } = req.body;
+        // Assuming you have a function to save the category to the database
+        await db.insertCategory(category_name);
+        res.redirect("/");
+    }
+];
 
 async function getCategory(req, res) {
 

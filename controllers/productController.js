@@ -1,5 +1,17 @@
 const db = require("../db/queries"); // Assuming you have a models directory with your database models
+const { body, validationResult } = require("express-validator");
 
+const alphaErr = "must contain only characters.";
+const lengthErr = "must be between 1 to 20 characters";
+const categoryErr = "must be a valid category.";
+
+const validateProduct = [
+    body("product_name")
+        .isLength({ min: 1, max: 30 }).withMessage(`Product name ${lengthErr}`)
+        .matches(/^[a-zA-Z0-9 ]+$/).withMessage(`Product name ${alphaErr}`),
+    body("category_id")
+        .isNumeric().withMessage(`Category ID ${categoryErr}`)
+];
 
 async function createGetProduct(req, res) {
     console.log("inside createGetProduct");
@@ -10,12 +22,27 @@ async function createGetProduct(req, res) {
 }
 
 
-async function createPostProduct(req, res) {
-    const { product_name, category_id } = req.body;
-    // Assuming you have a function to save the product to the database
-    await db.insertProduct(product_name, category_id);
-    res.redirect("/");
-}
+const createPostProduct = [
+    validateProduct, async (req, res) => {
+        const { product_name, category_id } = req.body;
+
+        const errors = validationResult(req);
+        const categories = await db.getAllCategories(); // Fetch all categories for the dropdown
+        categories.unshift({ category_id: 0, category_name: 'All Products' });
+
+        if (!errors.isEmpty()) {
+            return res.status(400).render("createProduct", {
+                title: "Create Product",
+                errors: errors.array(),
+                categories: categories,
+            });
+        }
+
+        // Assuming you have a function to save the product to the database
+        await db.insertProduct(product_name, category_id);
+        res.redirect("/");
+    }
+]
 
 async function getProduct(req, res) {
 
